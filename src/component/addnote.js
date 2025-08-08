@@ -1,30 +1,37 @@
 import { useState } from "react";
 
-const AddNote = ({ hadnleAddNote }) => {
-  const [notetext, setNoteText] = useState("");
+const AddNote = ({ handleAddNote }) => {
+  const [noteText, setNoteText] = useState("");
   const characterLimit = 200;
-  const hadnleChange = (event) => {
+
+  const handleChange = (event) => {
     if (characterLimit - event.target.value.length >= 0) {
       setNoteText(event.target.value);
     }
   };
-  const handleSaveClick = () => {
-    if (notetext.trim().length > 0) {
-      hadnleAddNote(notetext);
-      setNoteText("");
+
+  const handleSaveClick = async () => {
+    if (noteText.trim().length > 0) {
+      try {
+        await handleAddNote(noteText); // Use the prop function
+        setNoteText("");
+      } catch (error) {
+        console.error("Failed to save note:", error);
+      }
     }
   };
+
   return (
     <div className="note new">
       <textarea
         rows="8"
         cols="10"
-        placeholder="Type tp add a note..."
-        onChange={hadnleChange}
-        value={notetext}
+        placeholder="Type to add a note..."
+        onChange={handleChange}
+        value={noteText}
       ></textarea>
       <div className="note-footer">
-        <small>{characterLimit - notetext.length}</small>
+        <small>{characterLimit - noteText.length}</small>
         <button className="save" onClick={handleSaveClick}>
           Save
         </button>

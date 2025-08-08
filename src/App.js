@@ -1,79 +1,109 @@
-import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
 import NoteList from "./component/notes";
 import "bootstrap/dist/css/bootstrap.css";
 import Search from "./component/search";
 import Header from "./component/header";
+import { addNewNote, deleteNote, getNotes } from "./api/notes";
+import { nanoid } from "nanoid";
 const App = () => {
-  const [notes, setNotes] = useState([
-    {
-      id: nanoid(),
-      text: "This is my first Note!",
-      data: "1/1/2023",
-    },
-    {
-      id: nanoid(),
-      text: "This is my second Note!",
-      data: "15/1/2023",
-    },
-    {
-      id: nanoid(),
-      text: "This is my third Note!",
-      data: "19/1/2023",
-    },
-    {
-      id: nanoid(),
-      text: "This is my fourth Note!",
-      data: "17/1/2023",
-    },
-  ]);
+
+
+  const [notes, setNotes] = useState([])
 
   const [searchText, setsearchText] = useState("");
 
   const [darkMode, setdarkMode] = useState(false);
 
-  useEffect(() => {
-    localStorage.setItem("notes", JSON.stringify(notes));
-  }, [notes]);
 
-  useEffect(() => {
-    const savedNotes = JSON.parse(localStorage.getItem("notes"));
+  const savedNotes = [
+    {
+      id: nanoid(),
+      content: "This is my first Note!",
+      data: "1/1/2023",
+    },
+    {
+      id: nanoid(),
+      content: "This is my second Note!",
+      data: "15/1/2023",
+    },
+    {
+      id: nanoid(),
+      content: "This is my third Note!",
+      data: "19/1/2023",
+    },
+    {
+      id: nanoid(),
+      content: "This is my fourth Note!",
+      data: "17/1/2023",
+    },
+  ]
 
-    if (savedNotes) {
-      setNotes(savedNotes);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const loadNotes = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await getNotes();
+
+      // Verify response structure
+      if (response?.data) {
+        setNotes(response.data);
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      setError(error.message);
+      // Only fallback if savedNotes exists and is valid
+      if (Array.isArray(savedNotes)) {
+        setNotes(savedNotes);
+      } else {
+        setNotes([]); // Default empty array
+      }
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadNotes();
   }, []);
 
-  const addnote = (text) => {
-    const current = new Date();
-    const date = `${current.getDate()}/${
-      current.getMonth() + 1
-    }/${current.getFullYear()}`;
-    const newNote = {
-      id: nanoid(),
-      text: text,
-      date: date,
-    };
-    const newNotes = [...notes, newNote];
-    setNotes(newNotes);
+
+
+
+  const DeleteNote = async (note) => {
+
+    await deleteNote(note._id)
+    const notes = await getNotes()
+    setNotes(notes.data);
   };
 
-  const DeleteNote = (id) => {
-    const newNotes = notes.filter((note) => note.id !== id.id);
-    setNotes(newNotes);
+  const addNote = async (content) => {
+    try {
+      const newNote = await addNewNote({ content });
+
+      setNotes([...notes, newNote.data]); // Update state
+    } catch (error) {
+      console.error("Failed to add note:", error);
+    }
   };
+
+
 
   return (
     <div className={`${darkMode && "dark-mode"}`}>
       <div className="container">
         <Header handletoggledarkmode={setdarkMode} />
-        <Search hadnleSearch={setsearchText} />
+        <Search handleSearch={setsearchText} />
         <NoteList
           notes={notes.filter((note) =>
-            note.text.toLocaleLowerCase().includes(searchText)
+            note.content.toLocaleLowerCase().includes(searchText)
           )}
-          hadnleAddNote={addnote}
-          DeleteNote={DeleteNote}
+          handleAddNote={addNote}
+          DeleteNote={(note) => DeleteNote(note)}
         />
       </div>
     </div>

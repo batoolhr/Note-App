@@ -1,17 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-/* const Note = (props) => {
-  return (
-    
-  );
-};
-export default Note;
- */
+
 
 const Note = ({ notes, DeleteNote }) => {
   return (
     <div className="note">
-      <span>{notes.text}</span>
+      <span>{notes.content}</span>
       <div className="note-footer">
         <small>{notes.date} </small>
         <FontAwesomeIcon
@@ -22,6 +16,7 @@ const Note = ({ notes, DeleteNote }) => {
         ></FontAwesomeIcon>
       </div>
     </div>
+
   );
 };
 

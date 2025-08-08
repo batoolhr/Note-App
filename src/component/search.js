@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-const Search = ({ hadnleSearch }) => {
+const Search = ({ handleSearch }) => {
   return (
     <div className="search">
       <FontAwesomeIcon
@@ -8,7 +8,7 @@ const Search = ({ hadnleSearch }) => {
         icon={faSearch}
       ></FontAwesomeIcon>
       <input
-        onChange={(event) => hadnleSearch(event.target.value)}
+        onChange={(event) => handleSearch(event.target.value)}
         type="text"
         placeholder="type to Search..."
       />
